@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import datetime
 
-def pre_format_GR(raw_data: pd.DataFrame) -> pd.DataFrame:
+def pre_format_GR(raw_data: pd.DataFrame, half_stars: bool) -> pd.DataFrame:
     df = raw_data.copy()
 
     # Change column names dots to spaces
@@ -11,7 +11,10 @@ def pre_format_GR(raw_data: pd.DataFrame) -> pd.DataFrame:
     def convert_rating(r):
         if pd.isna(r) or r == "":
             return 0
-        return float(r) / 2
+        if (half_stars):
+            return float(r) / 2
+        else:
+            return float(r) // 2
 
     df["My Rating"] = df["My Rating"].apply(convert_rating)
 
@@ -98,7 +101,7 @@ def goodreads_data(book_data: pd.DataFrame) -> pd.DataFrame:
     return GD_df
 
 
-def transform_goodreads_format(raw_data: pd.DataFrame) -> pd.DataFrame:
-    formatted = pre_format_GR(raw_data)
+def transform_goodreads_format(raw_data: pd.DataFrame, half_stars: bool) -> pd.DataFrame:
+    formatted = pre_format_GR(raw_data, half_stars)
     gd_df = goodreads_data(formatted)
     return gd_df
