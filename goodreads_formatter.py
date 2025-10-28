@@ -30,7 +30,7 @@ def pre_format_GR(raw_data: pd.DataFrame, half_stars: bool) -> pd.DataFrame:
 
 def GR_df_matrix(num_books: int) -> pd.DataFrame:
     columns = [
-        "Book Id", "Title", "Author", "Author l - f", "Additional Authors", "ISBN", "ISBN13",
+        "Book Id", "Title", "Author", "Author l-f", "Additional Authors", "ISBN", "ISBN13",
         "My Rating", "Average Rating", "Publisher", "Binding", "Number of Pages",
         "Year Published", "Original Publication Year", "Date Read", "Date Added",
         "Bookshelves", "Bookshelves with positions", "Exclusive Shelf", "My Review",
@@ -67,17 +67,27 @@ def goodreads_data(book_data: pd.DataFrame) -> pd.DataFrame:
 
         parts = [p.strip() for p in shelves.split(",") if p.strip()]
         exclusive = shelf_map.get(parts[0], parts[0])
-        extras = [p for p in parts[1:] if p != "Posiadam"]
-        owned = 1 if "Posiadam" in parts[1:] else 0
+        extras = [p for p in parts[1:]]
 
         exclusive_list.append(exclusive)
         bookshelves_list.append(", ".join(extras))
-        owned_list.append(owned)
 
     GD_df["Exclusive Shelf"] = exclusive_list
     GD_df["Bookshelves"] = bookshelves_list
-    GD_df["Owned Copies"] = owned_list
 
+    # Author l - f (Last, First)
+    def format_author(name):
+        if not name or not isinstance(name, str):
+            return ""
+        parts = name.strip().split()
+        if len(parts) == 1:
+            return name
+        last = parts[-1]
+        first = " ".join(parts[:-1])
+        return f"{last}, {first}"
+
+    GD_df["Author l-f"] = GD_df["Author"].apply(format_author)
+    
     # Add positions for to-read and currently-reading
     status_list = [""] * num_books
     to_read_counter = 1
