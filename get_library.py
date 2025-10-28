@@ -106,10 +106,10 @@ def get_library(url, num_pages, driver_path):
         "Title": titles,
         "Author": authors,
         "ISBN": isbns,
-        "Rating": my_ratings,
+        "My Rating": my_ratings,
         "Date Read": my_dates_read,
-        "Shelves": shelves,
-        "Review": my_reviews
+        "Exclusive Shelf": shelves,
+        "My Review": my_reviews
     }).drop_duplicates()
 
     driver.quit()
