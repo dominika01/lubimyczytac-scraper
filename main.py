@@ -61,8 +61,11 @@ def make_library(url, num_pages, driver_path):
             time.sleep(1)
 
             # Rating
-            rating_el = book.select_one("span.listLibrary__ratingStarsNumber")
-            my_ratings.append(rating_el.get_text(strip=True) if rating_el else None)
+            rating_els = book.select("span.listLibrary__ratingStarsNumber")
+            if len(rating_els) >= 2:
+                my_ratings.append(rating_els[1].get_text(strip=True))
+            else:
+                my_ratings.append(None)
 
             # Review
             review_el = book.select(".expandTextNoJS")
