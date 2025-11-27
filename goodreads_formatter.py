@@ -1,6 +1,38 @@
 import pandas as pd
 from datetime import datetime
 
+def normalize_date(date_str: str) -> str:
+    if not date_str or not isinstance(date_str, str):
+        return ""
+
+    date_str = date_str.strip()
+
+    # Replace '-' with '/'
+    date_str = date_str.replace("-", "/")
+
+    parts = date_str.split("/")
+
+    # Pad missing parts
+    if len(parts) == 1:
+        # only year
+        year = parts[0]
+        month = "01"
+        day = "01"
+    elif len(parts) == 2:
+        # year + month
+        year, month = parts
+        day = "01"
+    else:
+        # full date
+        year, month, day = parts[:3]
+
+    # Zero-pad month/day if needed
+    month = month.zfill(2)
+    day = day.zfill(2)
+
+    return f"{year}/{month}/{day}"
+
+
 def pre_format_GR(raw_data: pd.DataFrame, half_stars: bool) -> pd.DataFrame:
     df = raw_data.copy()
 
@@ -20,7 +52,8 @@ def pre_format_GR(raw_data: pd.DataFrame, half_stars: bool) -> pd.DataFrame:
 
     # Convert date format YYYY-MM-DD -> YYYY/MM/DD
     if "Date Read" in df.columns:
-        df["Date Read"] = df["Date Read"].str.replace("-", "/", regex=False).fillna("")
+        df["Date Read"] = df["Date Read"].apply(normalize_date)
+
 
     # Fill NaN values with empty string
     df = df.fillna("")
